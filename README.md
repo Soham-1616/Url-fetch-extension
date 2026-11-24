@@ -8,4 +8,6 @@
 4. Select this folder
 5. Pin "Copy Tab URL" in the toolbar and open it
 
-The popup shows the active tab URL and copies it to the clipboard.
+The popup shows the active tab URL, copies it to the clipboard, and provides
+Light and Dark controls for the currently open website. Theme changes apply to
+the current page and are reset when that page is reloaded or navigated away from.

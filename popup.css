@@ -31,7 +31,7 @@ button {
   height: 38px;
   border: 0;
   border-radius: 6px;
-  background: #246bfd;
+  background: #3075ff;
   color: #ffffff;
   font-size: 14px;
   font-weight: 600;
@@ -42,9 +42,45 @@ button:hover {
   background: #1757d1;
 }
 
+#theme-heading {
+  margin: 16px 0 8px;
+  font-size: 14px;
+}
+
+.theme-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.theme-button {
+  height: 34px;
+  background: #e8edf5;
+  color: #172033;
+}
+
+.theme-button:hover {
+  background: #d7dfec;
+}
+
+.theme-button[aria-pressed="true"] {
+  background: #246bfd;
+  color: #ffffff;
+}
+
 #status {
   min-height: 18px;
   margin: 8px 0 0;
   color: #39734c;
   font-size: 12px;
+}
+
+#theme-status {
+  min-height: 18px;
+  margin: 8px 0 0;
+  color: #5b6575;
+  font-size: 12px;
+}
+
+header{
+  color: #172033;
 }
