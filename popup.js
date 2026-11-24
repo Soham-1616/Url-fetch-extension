@@ -4,6 +4,19 @@ const status = document.querySelector("#status");
 const themeStatus = document.querySelector("#theme-status");
 const lightThemeButton = document.querySelector("#light-theme");
 const darkThemeButton = document.querySelector("#dark-theme");
+const darkThemeCss = `
+  html[data-ost-theme="dark"] {
+    filter: invert(1) hue-rotate(180deg) !important;
+    background: #fff !important;
+  }
+  html[data-ost-theme="dark"] img,
+  html[data-ost-theme="dark"] video,
+  html[data-ost-theme="dark"] canvas,
+  html[data-ost-theme="dark"] iframe,
+  html[data-ost-theme="dark"] svg {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+`;
 let activeTabId;
 
 async function showActiveUrl() {
@@ -14,8 +27,8 @@ async function showActiveUrl() {
     status.textContent = "URL unavailable";
     themeStatus.textContent = "No active website is available.";
     copyButton.disabled = true;
-    return document.querySelector("#tab-title").textContent = tab.title;
-
+    document.querySelector("#tab-title").textContent = tab?.title ?? "No page available";
+    return;
   }
 
   activeTabId = tab.id;
@@ -50,44 +63,37 @@ async function updateThemeStatus() {
 async function applyTheme(theme) {
   if (activeTabId === undefined) {
     themeStatus.textContent = "No active website is available.";
-    // problem in changing the theme on this page how do I fix it?
-    console.error("Failed to change theme.");
     return;
   }
 
   try {
+    const [currentTheme] = await chrome.scripting.executeScript({
+      target: { tabId: activeTabId },
+      func: () => document.documentElement.getAttribute("data-ost-theme"),
+    });
+
+    if (theme === "dark" && currentTheme?.result !== "dark") {
+      await chrome.scripting.insertCSS({
+        target: { tabId: activeTabId },
+        css: darkThemeCss,
+      });
+    } else if (theme === "light") {
+      await chrome.scripting.removeCSS({
+        target: { tabId: activeTabId },
+        css: darkThemeCss,
+      });
+    }
+
     await chrome.scripting.executeScript({
       target: { tabId: activeTabId },
       args: [theme],
-      func: (selectedTheme) => {
-        const styleId = "ost-website-theme";
-        let style = document.getElementById(styleId);
-
-        if (!style) {
-          style = document.createElement("style");
-          style.id = styleId;
-          style.textContent = `
-            html[data-ost-theme="dark"] {
-              filter: invert(1) hue-rotate(180deg) !important;
-              background: #fff !important;
-            }
-            html[data-ost-theme="dark"] img,
-            html[data-ost-theme="dark"] video,
-            html[data-ost-theme="dark"] canvas,
-            html[data-ost-theme="dark"] iframe,
-            html[data-ost-theme="dark"] svg {
-              filter: invert(1) hue-rotate(180deg) !important;
-            }
-          `;
-          (document.head || document.documentElement).appendChild(style);
-        }
-
-        document.documentElement.setAttribute("data-ost-theme", selectedTheme);
-      },
+      func: (selectedTheme) =>
+        document.documentElement.setAttribute("data-ost-theme", selectedTheme),
     });
     setSelectedTheme(theme);
     themeStatus.textContent = `Website theme changed to ${theme}.`;
-  } catch {
+  } catch (error) {
+    console.error("Could not change the website theme.", error);
     themeStatus.textContent = "Could not change the theme on this page.";
   }
 }
