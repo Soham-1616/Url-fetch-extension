@@ -14,7 +14,7 @@ async function showActiveUrl() {
     status.textContent = "URL unavailable";
     themeStatus.textContent = "No active website is available.";
     copyButton.disabled = true;
-    return;  document.querySelector("#tab-title").textContent = tab.title;
+    return document.querySelector("#tab-title").textContent = tab.title;
 
   }
 
@@ -50,6 +50,8 @@ async function updateThemeStatus() {
 async function applyTheme(theme) {
   if (activeTabId === undefined) {
     themeStatus.textContent = "No active website is available.";
+    // problem in changing the theme on this page how do I fix it?
+    console.error("Failed to change theme.");
     return;
   }
 
